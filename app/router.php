@@ -4,10 +4,10 @@ namespace App;
 class Router
 {
     private $routes;
-    private $controllerName = 'SiteController';
-    private $actionName = '';
+    private $controllerName = 'base';
+    private $actionName = 'undefinedRoute';
     private $params = [];
-    private $controllerNamespace = 'App';
+    private $controllerNamespace = 'App\Controllers';
 
     public function __construct()
     {
@@ -17,12 +17,13 @@ class Router
 
     public function getController()
     {
-        return "{$this->controllerNamespace}\\{$this->controllerName}";
+        $controllerFileName = ucfirst($this->controllerName) . 'Controller';
+        return "{$this->controllerNamespace}\\{$controllerFileName}";
     }
 
     public function getActionName()
     {
-        return $this->actionName;
+        return 'action' . ucfirst($this->actionName);
     }
 
     public function getParams()
@@ -33,7 +34,7 @@ class Router
     private function getURI ()
     {
         if (!empty($_SERVER['REQUEST_URI'])) {
-            return trim($_SERVER['REQUEST_URI'], '/');
+            return trim($_SERVER['REQUEST_URI'], '/public/');
         }
     }
 
@@ -42,26 +43,18 @@ class Router
         $uri = $this->getURI();
 
         foreach ($this->routes as $uriPattern => $item) {
-            if (preg_match("~$uriPattern~", $uri)) {
+            if (preg_match("/$uriPattern/", $uri)) {
                 $path = $item['path'];
 
                 if (isset($item['namespace'])) {
                     $this->controllerNamespace = $item['namespace'];
                 }
 
-                $internalRoute = preg_replace(
-                    "~$uriPattern~", $path, $uri
-                );
+                $segments = explode('/', $path);
 
-                $segments = explode('/', $internalRoute);
+                $this->controllerName = array_shift($segments);
 
-                $this->controllerName = ucfirst(
-                    array_shift($segments).'Controller'
-                );
-
-                $this->actionName = 'action'.ucfirst(
-                    array_shift($segments)
-                );
+                $this->actionName = array_shift($segments);
 
                 $this->params = $segments;
             }

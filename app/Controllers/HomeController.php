@@ -8,6 +8,6 @@ class HomeController extends BaseController
 {
     public function actionIndex()
     {
-        var_dump("test");
+        var_dump("home controller index");
     }
 }

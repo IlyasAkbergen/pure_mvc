@@ -1,8 +1,7 @@
 <?php
 return [
-    'public' => [
+    'list' => [
         'path' => 'home/index',
         'namespace' => 'App\Controllers'
     ],
-    '/' => ['/home/index'],
 ];
